@@ -101,7 +101,7 @@ p "### criar usuario admin e acessar o Konga"
 
 # https://www.digitalocean.com/community/tutorials/uma-introducao-ao-servico-de-dns-do-kubernetes-pt
 # Chamar as APIs para configurar ROTAS
-pe "echo $SERVICE_IP"
+pe "echo $SERVICE_IP : relembrando o IP DO KONG"
 p ""
 pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=exemplo' --data 'url=http://mockbin.org'"
 pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/routes --data 'paths[]=/mockbin'"
