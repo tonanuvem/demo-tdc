@@ -8,7 +8,7 @@ Trilha API : Sexta-feira, 26 de Junho de 2020 das 14:30 às 19:00h no The Develo
 
 Serviços demonstrados:
 
-[FIAP Slackpage](https://github.com/tonanuvem/k8s-slackpage)
+[FIAP Slackpage](https://github.com/tonanuvem/slackpage)
 <br>
 [Sock Shop : A Microservice Demo Application](https://github.com/microservices-demo/microservices-demo/blob/master/deploy/kubernetes/complete-demo.yaml)
 
