@@ -1,6 +1,6 @@
 # demo-tdc
 
-Trilha de API : Sexta-feira, 26 de Junho de 2020 das 14:30 às 19:00h no The Developers Conference
+Trilha API : Sexta-feira, 26 de Junho de 2020 das 14:30 às 19:00h no The Developers Conference
 
 ## **Uso de API Gateway em um cluster Kubernetes.**
 
