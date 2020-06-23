@@ -64,16 +64,14 @@ pe "helm version"
 pe "curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3"
 pe "chmod 700 get_helm.sh"
 pe "./get_helm.sh"
-p ""
 pe "helm version"
 # Verificar versão do Client e do Server (v2 ou v3)
 
 ##
 # KONG
-p "cat 'vamos configurar o KONG:'"
+p "### vamos configurar o KONG:"
 pe "helm repo add bitnami https://charts.bitnami.com/bitnami"
 # helm search repo bitnami
-p ""
 pe "helm repo update"
 pe "kubectl create ns kong"
 pe "helm install kong --set service.exposeAdmin=true --set service.type=LoadBalancer --namespace kong bitnami/kong"
@@ -88,7 +86,7 @@ pe "echo http://$SERVICE_IP"
 
 ##
 # KONGA
-p "cat 'vamos configurar o KONGA:'"
+p "### vamos configurar o KONGA:"
 pe "git clone https://github.com/pantsel/konga.git"
 pe "cd konga/charts/konga/"
 pe "helm install konga -f ./values.yaml ../konga --set service.type=LoadBalancer --namespace kong --wait"
