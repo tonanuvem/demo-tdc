@@ -43,7 +43,6 @@ pe "gcloud compute instances list"
 
 # Rodar microservicos no Kubernetes
 p "### vamos Executar a aplicação FIAP (slackpage):"
-pe "git clone https://github.com/tonanuvem/k8s-slackpage.git"
 pe "kubectl create -f svc/demo-fiap.yml"
 pe "kubectl get svc"
 
