@@ -44,13 +44,12 @@ pe "gcloud compute instances list"
 # Rodar microservicos no Kubernetes
 p "### vamos Executar a aplicação FIAP (slackpage):"
 pe "git clone https://github.com/tonanuvem/k8s-slackpage.git"
-pe "kubectl create -f k8s-slackpage/deploy_fiap.yml"
-pe "kubectl create -f k8s-slackpage/svc_fiap_gcp.yml"
+pe "kubectl create -f svc/demo-fiap.yml"
 pe "kubectl get svc"
 
 # Executar a aplicação Sock Shop : A Microservice Demo Application
 p "### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
-pe "kubectl create -f k8s-slackpage/demo-weaveworks-socks.yaml"
+pe "kubectl create -f svc/demo-weaveworks-socks.yaml"
 pe "kubectl get svc -n sock-shop"
 #kubectl get all -n sock-shop
 
