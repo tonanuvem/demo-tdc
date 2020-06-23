@@ -8,4 +8,4 @@ Trilha de API : Sexta-feira, 26 de Junho de 2020 das 14:30 às 19:00h no The Dev
 
 ![Alt Text](tdc-floripa-api.jpg)
 
-[Mais informações sobre as outras trilhas e valores](https://lnkd.in/dtDrZQZ)
+[Mais informações sobre as outras trilhas e valores](https://thedevconf.com/tdc/2020/floripaonline/)
