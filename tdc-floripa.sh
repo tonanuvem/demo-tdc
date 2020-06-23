@@ -94,7 +94,7 @@ pe "kubectl get svc konga -n kong"
 ## se nao pegou o IP Externo, confirmar:
 # kubectl edit svc konga -n kong
 # verificar type: LoadBalancer
-## Criar usuario admin, Logar e Clicar em Dashboard
+p "### criar usuario admin e acessar o Konga"
 # Preencher os seguintes campos na configuração:
 #		Name 			= kong
 #		Kong Admin URL 	= http://kong:8001
