@@ -3,16 +3,16 @@ kind: Ingress
 metadata:
   name: tdc-ingress
   annotations:
-#    konghq.com/strip-path: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - http:
       paths:
-      - path: /mockbin
-        backend:
-          serviceName: svc-externo
-          servicePort: 80
+# Erro: while evaluating the ingress spec: service "default/svc-externo" is type "ExternalName", expected "NodePort" or "LoadBalancer";
+#      - path: /mockbin
+#        backend:
+#          serviceName: svc-externo
+#          servicePort: 80
       - path: /fiap
         backend:
           serviceName: fiap-service
@@ -21,7 +21,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingress-loja
+  name: tdc-ingress-loja
   namespace: sock-shop
   annotations:
     konghq.com/strip-path: "true"
