@@ -17,12 +17,25 @@ spec:
         backend:
           serviceName: fiap-service
           servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-loja
+  namespace: sock-shop
+  annotations:
+    konghq.com/strip-path: "true"
+    configuration.konghq.com: kongingress-loja
+spec:
+  rules:
+  - http:
+      paths:
       - path: /
         backend:
-          serviceName: sock-shop/front-end
+          serviceName: front-end
           servicePort: 80
       - path: /loja
         backend:
-          serviceName: sock-shop/front-end
+          serviceName: front-end
           servicePort: 80
 
