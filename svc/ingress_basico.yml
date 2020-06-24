@@ -25,8 +25,8 @@ metadata:
   name: tdc-ingress-loja
   namespace: sock-shop
   annotations:
-    konghq.com/strip-path: "true"
-    configuration.konghq.com: kongingress-loja
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
   - http:
