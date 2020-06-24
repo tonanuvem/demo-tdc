@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: demo
+  name: tdc-ingress
   annotations:
     konghq.com/strip-path: "true"
 #    nginx.ingress.kubernetes.io/rewrite-target: /
