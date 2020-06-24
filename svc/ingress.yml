@@ -4,6 +4,7 @@ metadata:
   name: demo
   annotations:
     konghq.com/strip-path: "true"
+#    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - http:
