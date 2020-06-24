@@ -4,6 +4,7 @@ metadata:
   name: tdc-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
   - http:
