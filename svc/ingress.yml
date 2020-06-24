@@ -12,11 +12,16 @@ spec:
         backend:
           serviceName: mockbin.org
           servicePort: 80
-      - path: /loja
-        backend:
-          serviceName: front-end.sock-shop.svc.cluster.local
-          servicePort: 80
       - path: /fiap
         backend:
           serviceName: fiap-service.default.svc.cluster.local
           servicePort: 80
+      - path: /
+        backend:
+          serviceName: front-end.sock-shop.svc.cluster.local
+          servicePort: 80
+      - path: /loja
+        backend:
+          serviceName: front-end.sock-shop.svc.cluster.local
+          servicePort: 80
+
