@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: demo
+  annotations:
+    konghq.com/strip-path: "true"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /mockbin
+        backend:
+          serviceName: mockbin.org
+          servicePort: 80
+      - path: /loja
+        backend:
+          serviceName: front-end.sock-shop.svc.cluster.local
+          servicePort: 80
+      - path: /fiap
+        backend:
+          serviceName: fiap-service.default.svc.cluster.local
+          servicePort: 80
