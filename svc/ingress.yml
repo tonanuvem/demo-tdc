@@ -3,26 +3,26 @@ kind: Ingress
 metadata:
   name: tdc-ingress
   annotations:
-    konghq.com/strip-path: "true"
-#    nginx.ingress.kubernetes.io/rewrite-target: /
+#    konghq.com/strip-path: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - http:
       paths:
       - path: /mockbin
         backend:
-          serviceName: mockbin.org
+          serviceName: svc-externo
           servicePort: 80
       - path: /fiap
         backend:
-          serviceName: fiap-service.default.svc.cluster.local
+          serviceName: fiap-service
           servicePort: 80
       - path: /
         backend:
-          serviceName: front-end.sock-shop.svc.cluster.local
+          serviceName: front-end
           servicePort: 80
       - path: /loja
         backend:
-          serviceName: front-end.sock-shop.svc.cluster.local
+          serviceName: front-end
           servicePort: 80
 
