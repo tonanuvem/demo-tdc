@@ -37,7 +37,7 @@ pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --c
 
 # Verificar as 2 instâncias e os pods do namespace kube-system:
 p ""
-pe "gcloud container clusters get-credentials $CLUSTER --zone $ZONE"
+gcloud container clusters get-credentials $CLUSTER --zone $ZONE
 #pe "kubectl get pods -n kube-system"
 pe "gcloud compute instances list"
 
@@ -61,7 +61,7 @@ p "### vamos configurar o HELM:"
 # pe "helm version"
 # Verificar versão do Client e do Server (v2 ou v3)
 #
-pe "curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && helm version"
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && helm version
 # Verificar versão do Client e do Server (v2 ou v3)
 
 ##
@@ -84,8 +84,7 @@ pe "curl http://$SERVICE_IP"
 ##
 # KONGA
 p "### vamos configurar o KONGA:"
-pe "git clone https://github.com/pantsel/konga.git"
-pe "cd konga/charts/konga/"
+pe "git clone https://github.com/pantsel/konga.git && cd konga/charts/konga/"
 pe "helm install konga -f ./values.yaml ../konga --set service.type=LoadBalancer --namespace kong --wait"
 pe "kubectl get svc konga -n kong"
 ## se nao pegou o IP Externo, confirmar:
@@ -131,13 +130,17 @@ pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/echo -d {"chave":"valor"}"
 #pe "curl -i -X GET --url http://$SERVICE_IP/loja"
 p ""
 p " ### ativando Autenticacao no API GATEWAY para rota /mockbin"
-pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/plugins/ --data 'name=key-auth'"
-p ""
-pe "curl -i -X POST --url http://$SERVICE_IP/mockbin/delay/2000"
-p ""
-pe "curl -i -X POST --url http://$SERVICE_IP:8001/consumers/ --data \"username=TDC\""
-p ""
-pe "curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'key=senha'"
+curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/plugins/ --data 'name=key-auth'
+curl -i -X POST --url http://$SERVICE_IP:8001/consumers/ --data "username=TDC"
+curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'key=senha'
+##
+#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/plugins/ --data 'name=key-auth'"
+#p ""
+#pe "curl -i -X POST --url http://$SERVICE_IP/mockbin/delay/2000"
+#p ""
+#pe "curl -i -X POST --url http://$SERVICE_IP:8001/consumers/ --data \"username=TDC\""
+#p ""
+#pe "curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'key=senha'"
 p ""
 pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/delay/2000 --header \"apikey: senha\""
 p ""
