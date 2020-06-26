@@ -36,7 +36,7 @@ CLUSTER=gke-tdc-floripa
 pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --cluster-version=latest"
 
 # Verificar as 2 instâncias e os pods do namespace kube-system:
-p ""
+#p ""
 gcloud container clusters get-credentials $CLUSTER --zone $ZONE
 #pe "kubectl get pods -n kube-system"
 pe "gcloud compute instances list"
@@ -73,7 +73,7 @@ pe "helm repo update"
 pe "kubectl create ns kong"
 pe "helm install kong --set service.exposeAdmin=true --set service.type=LoadBalancer --namespace kong bitnami/kong"
 pe "kubectl get svc -n kong"
-pe "export SERVICE_IP=$(kubectl get svc --namespace kong kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+export SERVICE_IP=$(kubectl get svc --namespace kong kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 #pe "echo http://$SERVICE_IP"
 pe "curl http://$SERVICE_IP"
 ## mensagem acima vai indicar que ainda não há rotas configuradas
