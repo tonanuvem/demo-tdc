@@ -107,6 +107,7 @@ curl -i -X POST --url http://$SERVICE_IP:8001/services/fiap/routes --data 'paths
 curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=loja' --data 'url=http://front-end.sock-shop.svc.cluster.local'
 curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/'
 curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/loja'
+p ""
 pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/echo -d {"chave":"valor"}"
 ##
 #pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=exemplo' --data 'url=http://mockbin.org'"
