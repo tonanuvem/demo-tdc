@@ -75,7 +75,7 @@ pe "helm install kong --set service.exposeAdmin=true --set service.type=LoadBala
 pe "kubectl get svc -n kong"
 export SERVICE_IP=$(kubectl get svc --namespace kong kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 #pe "echo http://$SERVICE_IP"
-pe "curl http://$SERVICE_IP"
+#pe "curl http://$SERVICE_IP"
 ## mensagem acima vai indicar que ainda não há rotas configuradas
 ## se nao pegou o IP Externo, confirmar:
 # kubectl edit svc kong -n kong
