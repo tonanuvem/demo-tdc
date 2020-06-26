@@ -27,8 +27,10 @@ DEMO_PROMPT="\r${WHITE}$ "
 clear
 
 #	Definir as variáveis de ambiente:
-pe "REGION=us-central1 && ZONE=${REGION}-b"
-pe "PROJECT=$(gcloud config get-value project) && CLUSTER=gke-tdc-floripa"
+REGION=us-central1
+ZONE=${REGION}-b
+PROJECT=$(gcloud config get-value project)
+CLUSTER=gke-tdc-floripa
 
 # Criar um cluster de dois nós:
 pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --cluster-version=latest"
