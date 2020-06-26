@@ -27,10 +27,8 @@ DEMO_PROMPT="\r${WHITE}$ "
 clear
 
 #	Definir as variáveis de ambiente:
-pe "REGION=us-central1"
-pe "ZONE=${REGION}-b"
-pe "PROJECT=$(gcloud config get-value project)"
-pe "CLUSTER=gke-tdc-floripa"
+pe "REGION=us-central1 && ZONE=${REGION}-b"
+pe "PROJECT=$(gcloud config get-value project) && CLUSTER=gke-tdc-floripa"
 
 # Criar um cluster de dois nós:
 pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --cluster-version=latest"
@@ -58,13 +56,10 @@ pe "kubectl get svc -n sock-shop | grep front-end"
 
 # HELM
 p "### vamos configurar o HELM:"
-pe "helm version"
+# pe "helm version"
 # Verificar versão do Client e do Server (v2 ou v3)
 #
-pe "curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3"
-pe "chmod 700 get_helm.sh"
-pe "./get_helm.sh"
-pe "helm version"
+pe "curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && helm version"
 # Verificar versão do Client e do Server (v2 ou v3)
 
 ##
