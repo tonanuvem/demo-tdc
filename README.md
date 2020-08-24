@@ -1,6 +1,6 @@
 # demo-tdc
 
-Trilha Microservice : Terça-feira, 25 de Agosto de 2020 das 10:45 às 11:20 no The Developers Conference
+Trilha Microservices : Terça-feira, 25 de Agosto de 2020 das 10:45 às 11:20 no The Developers Conference
 
 ## **Como traduzir a arquitetura de Microservices para os componentes do Kubernetes?**
 
