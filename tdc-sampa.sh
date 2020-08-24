@@ -69,6 +69,17 @@ p "### habilitar modulo KIALI do ISTIO service mesh"
 kubectl apply -f ../istio-1.7.0/samples/addons
 while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -n istio-system; do sleep 1; done
 
+# Istio Ingress gateway (istio-ingressgateway
+# https://istio.io/docs/tasks/traffic-management/
+# https://istio.io/latest/docs/tasks/observability/gateways/
+#kubectl get svc istio-ingressgateway -n istio-system
+export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+export INGRESS_DOMAIN=${INGRESS_HOST}.nip.io
+echo $INGRESS_DOMAIN
+sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
+p "### vamos habilitar a observabilidade do nosso service mesh"
+kubectl apply -f istio/ingress_observabilidade.yaml
+
 # Rodar microservicos no Kubernetes
 #p "### vamos Executar a aplicação FIAP (slackpage):"
 #pe "kubectl create -f svc/demo-fiap.yml"
@@ -77,6 +88,7 @@ while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -
 # Executar a aplicação Sock Shop : A Microservice Demo Application
 p "### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
 pe "kubectl create -f svc/demo-weaveworks-socks.yaml"
+kubectl label namespace sock-shop istio-injection=enabled
 pe "kubectl get svc -n sock-shop"
 #kubectl get all -n sock-shop
 
@@ -86,21 +98,14 @@ p ""
 pe "kubectl get svc -n sock-shop | grep front-end"
 p ""
 
-# Istio Ingress gateway (istio-ingressgateway
-# https://istio.io/docs/tasks/traffic-management/
-# https://istio.io/latest/docs/tasks/observability/gateways/
-kubectl get svc istio-ingressgateway -n istio-system
-export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-export INGRESS_DOMAIN=${INGRESS_HOST}.nip.io
-echo $INGRESS_DOMAIN
-sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
-kubectl apply -f istio/ingress_observabilidade.yaml
-
-
 # Kiali
 pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
 pe "# Acessar no navegador: http://IP_KIALI"
 
+#Kiali: http://kiali.${INGRESS_DOMAIN}
+#Prometheus: http://prometheus.${INGRESS_DOMAIN}
+#Grafana: http://grafana.${INGRESS_DOMAIN}
+#Tracing: http://tracing.${INGRESS_DOMAIN}
 
 # HELM
 #p "### vamos configurar o HELM:"
