@@ -58,6 +58,7 @@ gcloud container clusters get-credentials $CLUSTER --zone $ZONE
 #cd istio-1.7.0 && export PATH=$PWD/bin:$PATH
 p " ### vamos instalar ISTIO service mesh"
 ../istio-1.7.0/bin/istioctl install --set profile=demo
+kubectl label namespace default istio-injection=enabled
 ../istio-1.7.0/bin/istioctl analyze
 #pe "kubectl get deploy -n istio-system"
 #pe "kubectl get rs -n istio-system"
