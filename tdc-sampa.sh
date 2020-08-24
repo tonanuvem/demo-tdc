@@ -30,21 +30,50 @@ clear
 REGION=us-central1
 ZONE=${REGION}-b
 PROJECT=$(gcloud config get-value project)
-CLUSTER=gke-tdc-floripa
+CLUSTER=gke-tdc-sampa
+CLUSTER_VERSION=1.17.8-gke.17
 
 # Criar um cluster de dois nós:
-pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --cluster-version=latest"
+#pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --cluster-version=latest"
+
+# Criar um cluster de cinco nós:
+gcloud beta container clusters create ${CLUSTER} \
+    --cluster-version=latest" \
+#    --cluster-version=${CLUSTER_VERSION} \
+#    --addons=Istio --istio-config=auth=MTLS_STRICT \
+    --machine-type=n1-standard-2 \
+    --num-nodes=5 --zone ${ZONE}
 
 # Verificar as 2 instâncias e os pods do namespace kube-system:
 #p ""
 gcloud container clusters get-credentials $CLUSTER --zone $ZONE
 #pe "kubectl get pods -n kube-system"
+pe "gcloud container clusters list"
 pe "gcloud compute instances list"
 
+
+# Istio sem addon
+#curl -L https://istio.io/downloadIstio | sh - 
+#cd istio-1.6.8 && export PATH=$PWD/bin:$PATH
+istioctl install --set profile=demo
+kubectl label namespace default istio-injection=enabled
+kubectl get pod -n istio-system
+istioctl analyze
+
+# Verificar Istio service mesh:
+#p "### vamos Verificar ISTIO service mesh"
+pe "kubectl get service -n istio-system"
+pe "kubectl label namespace default istio-injection=enabled"
+pe "kubectl get pods -n istio-system"
+pe "kubectl scale -n istio-system --replicas=2 deployment/istio-pilot"
+pe "kubectl get pods -n istio-system | grep istio-pilot"
+
+
+
 # Rodar microservicos no Kubernetes
-p "### vamos Executar a aplicação FIAP (slackpage):"
-pe "kubectl create -f svc/demo-fiap.yml"
-pe "kubectl get svc"
+#p "### vamos Executar a aplicação FIAP (slackpage):"
+#pe "kubectl create -f svc/demo-fiap.yml"
+#pe "kubectl get svc"
 
 # Executar a aplicação Sock Shop : A Microservice Demo Application
 p "### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
@@ -54,26 +83,36 @@ pe "kubectl get svc -n sock-shop"
 
 p "### vamos verificar se os serviços receberam IP Externo:"
 pe "kubectl get svc"
+p ""
 pe "kubectl get svc -n sock-shop | grep front-end"
+p ""
+
+# Istio Ingress gateway (istio-ingressgateway
+# https://istio.io/docs/tasks/traffic-management/
+
+# Kiali
+pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
+pe "# Acessar no navegador: http://IP_KIALI"
+
 
 # HELM
-p "### vamos configurar o HELM:"
+#p "### vamos configurar o HELM:"
 # pe "helm version"
 # Verificar versão do Client e do Server (v2 ou v3)
 #
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && helm version
+#curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && helm version
 # Verificar versão do Client e do Server (v2 ou v3)
 
 ##
 # KONG
-p "### vamos configurar o KONG:"
-pe "helm repo add bitnami https://charts.bitnami.com/bitnami"
+#p "### vamos configurar o KONG:"
+#pe "helm repo add bitnami https://charts.bitnami.com/bitnami"
 # helm search repo bitnami
-pe "helm repo update"
-pe "kubectl create ns kong"
-pe "helm install kong --set service.exposeAdmin=true --set service.type=LoadBalancer --namespace kong bitnami/kong"
-pe "kubectl get svc -n kong"
-export SERVICE_IP=$(kubectl get svc --namespace kong kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+#pe "helm repo update"
+#pe "kubectl create ns kong"
+#pe "helm install kong --set service.exposeAdmin=true --set service.type=LoadBalancer --namespace kong bitnami/kong"
+#pe "kubectl get svc -n kong"
+#export SERVICE_IP=$(kubectl get svc --namespace kong kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 #pe "echo http://$SERVICE_IP"
 #pe "curl http://$SERVICE_IP"
 ## mensagem acima vai indicar que ainda não há rotas configuradas
@@ -83,31 +122,31 @@ export SERVICE_IP=$(kubectl get svc --namespace kong kong -o jsonpath='{.status.
 
 ##
 # KONGA
-p "### vamos configurar o KONGA:"
-pe "git clone https://github.com/pantsel/konga.git && cd konga/charts/konga/"
-pe "helm install konga -f ./values.yaml ../konga --set service.type=LoadBalancer --namespace kong --wait"
-pe "kubectl get svc konga -n kong"
+#p "### vamos configurar o KONGA:"
+#pe "git clone https://github.com/pantsel/konga.git && cd konga/charts/konga/"
+#pe "helm install konga -f ./values.yaml ../konga --set service.type=LoadBalancer --namespace kong --wait"
+#pe "kubectl get svc konga -n kong"
 ## se nao pegou o IP Externo, confirmar:
 # kubectl edit svc konga -n kong
 # verificar type: LoadBalancer
-p "### criar usuario admin e acessar o Konga"
+#p "### criar usuario admin e acessar o Konga"
 # Preencher os seguintes campos na configuração:
 #		Name 			= kong
 #		Kong Admin URL 	= http://kong:8001
 
 # https://www.digitalocean.com/community/tutorials/uma-introducao-ao-servico-de-dns-do-kubernetes-pt
 # Chamar as APIs para configurar ROTAS
-pe "echo $SERVICE_IP : relembrando o IP DO KONG"
-p " ### criando rotas para /mockbin , /fiap , /loja"
-curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=exemplo' --data 'url=http://mockbin.org'
-curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/routes --data 'paths[]=/mockbin'
-curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=fiap' --data 'url=http://fiap-service.default.svc.cluster.local'
-curl -i -X POST --url http://$SERVICE_IP:8001/services/fiap/routes --data 'paths[]=/fiap'
-curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=loja' --data 'url=http://front-end.sock-shop.svc.cluster.local'
-curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/'
-curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/loja'
-p ""
-pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/echo -d {"chave":"valor"}"
+#pe "echo $SERVICE_IP : relembrando o IP DO KONG"
+#p " ### criando rotas para /mockbin , /fiap , /loja"
+#curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=exemplo' --data 'url=http://mockbin.org'
+#curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/routes --data 'paths[]=/mockbin'
+#curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=fiap' --data 'url=http://fiap-service.default.svc.cluster.local'
+#curl -i -X POST --url http://$SERVICE_IP:8001/services/fiap/routes --data 'paths[]=/fiap'
+#curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=loja' --data 'url=http://front-end.sock-shop.svc.cluster.local'
+#curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/'
+#curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/loja'
+#p ""
+#pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/echo -d {"chave":"valor"}"
 ##
 #pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=exemplo' --data 'url=http://mockbin.org'"
 #p ""
@@ -128,11 +167,11 @@ pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/echo -d {"chave":"valor"}"
 #pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/loja'"
 #p ""
 #pe "curl -i -X GET --url http://$SERVICE_IP/loja"
-p ""
-p " ### ativando Autenticacao no API GATEWAY para rota /mockbin"
-curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/plugins/ --data 'name=key-auth'
-curl -i -X POST --url http://$SERVICE_IP:8001/consumers/ --data "username=TDC"
-curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'key=senha'
+#p ""
+#p " ### ativando Autenticacao no API GATEWAY para rota /mockbin"
+#curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/plugins/ --data 'name=key-auth'
+#curl -i -X POST --url http://$SERVICE_IP:8001/consumers/ --data "username=TDC"
+#curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'key=senha'
 ##
 #pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/plugins/ --data 'name=key-auth'"
 #p ""
@@ -141,9 +180,9 @@ curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'ke
 #pe "curl -i -X POST --url http://$SERVICE_IP:8001/consumers/ --data \"username=TDC\""
 #p ""
 #pe "curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'key=senha'"
-p ""
-pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/delay/2000 --header \"apikey: senha\""
-p ""
+#p ""
+#pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/delay/2000 --header \"apikey: senha\""
+#p ""
 
 ########### Excluir o cluster do GKE
 
@@ -152,4 +191,4 @@ p " ### FIM ###"
 pe "gcloud container clusters delete $CLUSTER --zone $ZONE"
 
 
-# ---------
+# ---------#
