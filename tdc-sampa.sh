@@ -50,7 +50,7 @@ pe "gcloud container clusters create ${CLUSTER} --cluster-version=latest --machi
 gcloud container clusters get-credentials $CLUSTER --zone $ZONE
 #pe "kubectl get pods -n kube-system"
 #pe "gcloud container clusters list"
-pe "gcloud compute instances list"
+#pe "gcloud compute instances list"
 
 
 # Istio service mesh
@@ -106,7 +106,8 @@ pe "kubectl get svc istio-ingressgateway -n istio-system"
 
 # Kiali
 #pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
-pe "# Acessar no navegador: http://kiali.${INGRESS_DOMAIN}"
+p "# Acessar no navegador: http://shop.${INGRESS_DOMAIN}"
+p "# Acessar no navegador: http://kiali.${INGRESS_DOMAIN}"
 
 #Kiali: http://kiali.${INGRESS_DOMAIN}
 #Prometheus: http://prometheus.${INGRESS_DOMAIN}
