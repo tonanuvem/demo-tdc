@@ -37,7 +37,7 @@ metadata:
   name: shop
   namespace: istio-system
 spec:
-  host: shop
+  host: front-end.sock-shop.svc.cluster.local
   trafficPolicy:
     tls:
       mode: DISABLE
