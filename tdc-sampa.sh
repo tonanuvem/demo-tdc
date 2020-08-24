@@ -70,7 +70,7 @@ pe "kubectl get pod -n istio-system"
 #pe "kubectl scale -n istio-system --replicas=2 deployment/istiod"
 #pe "kubectl get pods -n istio-system | grep istiod"
 
-p " ### habilitar modulo KIALI do ISTIO service mesh"
+#p " ### habilitar modulo KIALI do ISTIO service mesh"
 kubectl apply -f ../istio-1.7.0/samples/addons | grep created
 while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -n istio-system; do sleep 1; done
 
@@ -82,7 +82,7 @@ export INGRESS_DOMAIN=${INGRESS_HOST}.nip.io
 echo $INGRESS_DOMAIN
 sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
 
-p " ### vamos habilitar a observabilidade do nosso service mesh"
+#p " ### vamos habilitar a observabilidade do nosso service mesh"
 kubectl apply -f istio/ingress_observabilidade.yaml
 
 # Executar a aplicação Sock Shop : A Microservice Demo Application
@@ -105,10 +105,11 @@ pe "kubectl get svc istio-ingressgateway -n istio-system"
 
 # Kiali
 #pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
+p " # Visualizar o Service Mesh: http://kiali.${INGRESS_DOMAIN}"
+p ""
 p " # Acessar no navegador: http://shop.${INGRESS_DOMAIN}"
 p ""
-p " # Acessar no navegador: http://kiali.${INGRESS_DOMAIN}"
-p ""
+
 #Kiali: http://kiali.${INGRESS_DOMAIN}
 #Prometheus: http://prometheus.${INGRESS_DOMAIN}
 #Grafana: http://grafana.${INGRESS_DOMAIN}
