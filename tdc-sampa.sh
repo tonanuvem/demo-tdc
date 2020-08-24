@@ -58,12 +58,11 @@ gcloud container clusters get-credentials $CLUSTER --zone $ZONE
 #cd istio-1.7.0 && export PATH=$PWD/bin:$PATH
 p "### vamos instalar ISTIO service mesh"
 ../istio-1.7.0/bin/istioctl install --set profile=demo
-kubectl label namespace default istio-injection=enabled
 ../istio-1.7.0/bin/istioctl analyze
-pe "kubectl get deploy -n istio-system"
-pe "kubectl get rs -n istio-system"
+#pe "kubectl get deploy -n istio-system"
+#pe "kubectl get rs -n istio-system"
 pe "kubectl get pod -n istio-system"
-pe "kubectl get service -n istio-system"
+#pe "kubectl get service -n istio-system"
 #p "### aumentar resiliencia do ISTIO service mesh"
 #pe "kubectl scale -n istio-system --replicas=2 deployment/istiod"
 #pe "kubectl get pods -n istio-system | grep istiod"
@@ -83,17 +82,15 @@ sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
 p "### vamos habilitar a observabilidade do nosso service mesh"
 kubectl apply -f istio/ingress_observabilidade.yaml
 
-# Rodar microservicos no Kubernetes
-#p "### vamos Executar a aplicação FIAP (slackpage):"
-#pe "kubectl create -f svc/demo-fiap.yml"
-#pe "kubectl get svc"
-
 # Executar a aplicação Sock Shop : A Microservice Demo Application
 p "### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
+kubectl create ns sock-shop
+kubectl label namespace sock-shop istio-injection=enabled
 pe "kubectl create -f svc/demo-weaveworks-socks.yaml"
 kubectl label namespace sock-shop istio-injection=enabled
 sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_shop.yaml
 kubectl apply -f istio/ingress_shop.yaml
+../istio-1.7.0/bin/istioctl analyze --all-namespaces
 #pe "kubectl get svc -n sock-shop"
 #kubectl get all -n sock-shop
 
