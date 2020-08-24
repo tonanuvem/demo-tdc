@@ -1,0 +1,44 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: shop-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http-shop
+      protocol: HTTP
+    hosts:
+    - "shop.DOMINIO"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: shop-vs
+  namespace: istio-system
+spec:
+  hosts:
+  - "shop.DOMINIO"
+  gateways:
+  - shop-gateway
+  http:
+  - route:
+    - destination:
+        host: shop
+        port:
+          number: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: shop
+  namespace: istio-system
+spec:
+  host: shop
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
