@@ -1,4 +1,4 @@
 clear
 sudo apt-get install pv
-chmod +x tdc-floripa.sh
-./tdc-floripa.sh
+chmod +x tdc-sampa.sh
+./tdc-sampa.sh
