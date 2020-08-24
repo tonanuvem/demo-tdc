@@ -89,6 +89,8 @@ kubectl apply -f istio/ingress_observabilidade.yaml
 p "### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
 pe "kubectl create -f svc/demo-weaveworks-socks.yaml"
 kubectl label namespace sock-shop istio-injection=enabled
+sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
+kubectl apply -f istio/ingress_shop.yaml
 pe "kubectl get svc -n sock-shop"
 #kubectl get all -n sock-shop
 
@@ -99,7 +101,7 @@ pe "kubectl get svc -n sock-shop | grep front-end"
 p ""
 
 # Kiali
-pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
+#pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
 pe "# Acessar no navegador: http://IP_KIALI"
 
 #Kiali: http://kiali.${INGRESS_DOMAIN}
