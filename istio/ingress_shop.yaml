@@ -27,7 +27,7 @@ spec:
   http:
   - route:
     - destination:
-        host: shop
+        host: front-end.sock-shop.svc.cluster.local
         port:
           number: 80
 ---
