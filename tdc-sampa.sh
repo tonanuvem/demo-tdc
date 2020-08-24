@@ -71,12 +71,19 @@ kubectl label namespace kube-node-lease istio-injection=enabled
 #pe "kubectl get pods -n istio-system | grep istiod"
 
 #p " ### habilitar modulo KIALI do ISTIO service mesh"
-kubectl apply -f ../istio-1.7.0/samples/addons | grep created
+kubectl apply -f ../istio-1.7.0/samples/addons
 while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -n istio-system; do sleep 1; done
 
 # Istio Ingress gateway (istio-ingressgateway
 # https://istio.io/docs/tasks/traffic-management/
 # https://istio.io/latest/docs/tasks/observability/gateways/
+external_ip=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+echo $external_ip
+while [ -z $external_ip ]; do
+    printf "."
+    sleep 1
+    external_ip=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+done
 export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 export INGRESS_DOMAIN=${INGRESS_HOST}.nip.io
 echo $INGRESS_DOMAIN
