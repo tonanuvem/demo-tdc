@@ -56,7 +56,7 @@ gcloud container clusters get-credentials $CLUSTER --zone $ZONE
 # Istio service mesh
 #curl -L https://istio.io/downloadIstio | sh - 
 #cd istio-1.7.0 && export PATH=$PWD/bin:$PATH
-p "### vamos instalar ISTIO service mesh"
+p " ### vamos instalar ISTIO service mesh"
 ../istio-1.7.0/bin/istioctl install --set profile=demo
 ../istio-1.7.0/bin/istioctl analyze
 #pe "kubectl get deploy -n istio-system"
@@ -67,7 +67,7 @@ pe "kubectl get pod -n istio-system"
 #pe "kubectl scale -n istio-system --replicas=2 deployment/istiod"
 #pe "kubectl get pods -n istio-system | grep istiod"
 
-p "### habilitar modulo KIALI do ISTIO service mesh"
+p " ### habilitar modulo KIALI do ISTIO service mesh"
 kubectl apply -f ../istio-1.7.0/samples/addons
 while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -n istio-system; do sleep 1; done
 
@@ -79,11 +79,11 @@ export INGRESS_DOMAIN=${INGRESS_HOST}.nip.io
 echo $INGRESS_DOMAIN
 sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
 
-p "### vamos habilitar a observabilidade do nosso service mesh"
+p " ### vamos habilitar a observabilidade do nosso service mesh"
 kubectl apply -f istio/ingress_observabilidade.yaml
 
 # Executar a aplicação Sock Shop : A Microservice Demo Application
-p "### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
+p " ### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
 kubectl create ns sock-shop
 kubectl label namespace sock-shop istio-injection=enabled
 pe "kubectl create -f svc/demo-weaveworks-socks.yaml"
@@ -94,7 +94,7 @@ kubectl apply -f istio/ingress_shop.yaml
 #pe "kubectl get svc -n sock-shop"
 #kubectl get all -n sock-shop
 
-p "### vamos verificar o Ingress IP Externo:"
+p " ### vamos verificar o Ingress IP Externo:"
 pe "kubectl get svc istio-ingressgateway -n istio-system"
 #pe "kubectl get svc"
 #p ""
@@ -103,9 +103,10 @@ pe "kubectl get svc istio-ingressgateway -n istio-system"
 
 # Kiali
 #pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
-p "# Acessar no navegador: http://shop.${INGRESS_DOMAIN}"
-p "# Acessar no navegador: http://kiali.${INGRESS_DOMAIN}"
-
+p " # Acessar no navegador: http://shop.${INGRESS_DOMAIN}"
+p ""
+p " # Acessar no navegador: http://kiali.${INGRESS_DOMAIN}"
+p ""
 #Kiali: http://kiali.${INGRESS_DOMAIN}
 #Prometheus: http://prometheus.${INGRESS_DOMAIN}
 #Grafana: http://grafana.${INGRESS_DOMAIN}
