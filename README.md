@@ -8,7 +8,6 @@ Trilha Microservices : Terça-feira, 25 de Agosto de 2020 das 10:45 às 11:20 no
 
 Serviços demonstrados:
 
-[FIAP Slackpage](https://github.com/tonanuvem/slackpage)
 <br>
 [Sock Shop : A Microservice Demo Application](https://github.com/microservices-demo/microservices-demo/blob/master/deploy/kubernetes/complete-demo.yaml)
 
