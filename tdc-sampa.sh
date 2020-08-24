@@ -54,7 +54,7 @@ pe "gcloud compute instances list"
 
 # Istio sem addon
 #curl -L https://istio.io/downloadIstio | sh - 
-#cd istio-1.6.8 && export PATH=$PWD/bin:$PATH
+#cd istio-1.7.0 && export PATH=$PWD/bin:$PATH
 istioctl install --set profile=demo
 kubectl label namespace default istio-injection=enabled
 kubectl get pod -n istio-system
