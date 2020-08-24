@@ -37,7 +37,7 @@ CLUSTER_VERSION=1.17.8-gke.17
 #pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --cluster-version=latest"
 
 # Criar um cluster de cinco nós:
-gcloud container clusters create ${CLUSTER} --cluster-version=latest --machine-type=n1-standard-2 --num-nodes=5 --zone ${ZONE}
+pe "gcloud container clusters create ${CLUSTER} --cluster-version=latest --machine-type=n1-standard-2 --num-nodes=5 --zone ${ZONE}"
 #gcloud beta container clusters create ${CLUSTER} \
 #    --cluster-version=latest \
 ##    --cluster-version=${CLUSTER_VERSION} \
@@ -60,11 +60,14 @@ p "### vamos instalar ISTIO service mesh"
 ../istio-1.7.0/bin/istioctl install --set profile=demo
 kubectl label namespace default istio-injection=enabled
 ../istio-1.7.0/bin/istioctl analyze
+pe "kubectl get deploy -n istio-system"
+pe "kubectl get rs -n istio-system"
 pe "kubectl get pod -n istio-system"
 pe "kubectl get service -n istio-system"
-p "### aumentar resiliencia do ISTIO service mesh"
-pe "kubectl scale -n istio-system --replicas=2 deployment/istiod"
-pe "kubectl get pods -n istio-system | grep istiod"
+#p "### aumentar resiliencia do ISTIO service mesh"
+#pe "kubectl scale -n istio-system --replicas=2 deployment/istiod"
+#pe "kubectl get pods -n istio-system | grep istiod"
+
 p "### habilitar modulo KIALI do ISTIO service mesh"
 kubectl apply -f ../istio-1.7.0/samples/addons
 while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -n istio-system; do sleep 1; done
@@ -72,11 +75,11 @@ while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -
 # Istio Ingress gateway (istio-ingressgateway
 # https://istio.io/docs/tasks/traffic-management/
 # https://istio.io/latest/docs/tasks/observability/gateways/
-#kubectl get svc istio-ingressgateway -n istio-system
 export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 export INGRESS_DOMAIN=${INGRESS_HOST}.nip.io
 echo $INGRESS_DOMAIN
 sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
+
 p "### vamos habilitar a observabilidade do nosso service mesh"
 kubectl apply -f istio/ingress_observabilidade.yaml
 
@@ -89,114 +92,27 @@ kubectl apply -f istio/ingress_observabilidade.yaml
 p "### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
 pe "kubectl create -f svc/demo-weaveworks-socks.yaml"
 kubectl label namespace sock-shop istio-injection=enabled
-sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
+sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_shop.yaml
 kubectl apply -f istio/ingress_shop.yaml
-pe "kubectl get svc -n sock-shop"
+#pe "kubectl get svc -n sock-shop"
 #kubectl get all -n sock-shop
 
-p "### vamos verificar se os serviços receberam IP Externo:"
-pe "kubectl get svc"
-p ""
-pe "kubectl get svc -n sock-shop | grep front-end"
-p ""
+p "### vamos verificar o Ingress IP Externo:"
+pe "kubectl get svc istio-ingressgateway -n istio-system"
+#pe "kubectl get svc"
+#p ""
+#pe "kubectl get svc -n sock-shop | grep front-end"
+#p ""
 
 # Kiali
 #pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
-pe "# Acessar no navegador: http://IP_KIALI"
+pe "# Acessar no navegador: http://kiali.${INGRESS_DOMAIN}"
 
 #Kiali: http://kiali.${INGRESS_DOMAIN}
 #Prometheus: http://prometheus.${INGRESS_DOMAIN}
 #Grafana: http://grafana.${INGRESS_DOMAIN}
 #Tracing: http://tracing.${INGRESS_DOMAIN}
-
-# HELM
-#p "### vamos configurar o HELM:"
-# pe "helm version"
-# Verificar versão do Client e do Server (v2 ou v3)
-#
-#curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && helm version
-# Verificar versão do Client e do Server (v2 ou v3)
-
-##
-# KONG
-#p "### vamos configurar o KONG:"
-#pe "helm repo add bitnami https://charts.bitnami.com/bitnami"
-# helm search repo bitnami
-#pe "helm repo update"
-#pe "kubectl create ns kong"
-#pe "helm install kong --set service.exposeAdmin=true --set service.type=LoadBalancer --namespace kong bitnami/kong"
-#pe "kubectl get svc -n kong"
-#export SERVICE_IP=$(kubectl get svc --namespace kong kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-#pe "echo http://$SERVICE_IP"
-#pe "curl http://$SERVICE_IP"
-## mensagem acima vai indicar que ainda não há rotas configuradas
-## se nao pegou o IP Externo, confirmar:
-# kubectl edit svc kong -n kong
-# verificar type: LoadBalancer
-
-##
-# KONGA
-#p "### vamos configurar o KONGA:"
-#pe "git clone https://github.com/pantsel/konga.git && cd konga/charts/konga/"
-#pe "helm install konga -f ./values.yaml ../konga --set service.type=LoadBalancer --namespace kong --wait"
-#pe "kubectl get svc konga -n kong"
-## se nao pegou o IP Externo, confirmar:
-# kubectl edit svc konga -n kong
-# verificar type: LoadBalancer
-#p "### criar usuario admin e acessar o Konga"
-# Preencher os seguintes campos na configuração:
-#		Name 			= kong
-#		Kong Admin URL 	= http://kong:8001
-
-# https://www.digitalocean.com/community/tutorials/uma-introducao-ao-servico-de-dns-do-kubernetes-pt
-# Chamar as APIs para configurar ROTAS
-#pe "echo $SERVICE_IP : relembrando o IP DO KONG"
-#p " ### criando rotas para /mockbin , /fiap , /loja"
-#curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=exemplo' --data 'url=http://mockbin.org'
-#curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/routes --data 'paths[]=/mockbin'
-#curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=fiap' --data 'url=http://fiap-service.default.svc.cluster.local'
-#curl -i -X POST --url http://$SERVICE_IP:8001/services/fiap/routes --data 'paths[]=/fiap'
-#curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=loja' --data 'url=http://front-end.sock-shop.svc.cluster.local'
-#curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/'
-#curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/loja'
-#p ""
-#pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/echo -d {"chave":"valor"}"
-##
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=exemplo' --data 'url=http://mockbin.org'"
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/routes --data 'paths[]=/mockbin'"
-#p ""
-#pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/echo -d {"chave":"valor"}"
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=fiap' --data 'url=http://fiap-service.default.svc.cluster.local'"
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/fiap/routes --data 'paths[]=/fiap'"
-#p ""
-#pe "curl -i -X GET --url http://$SERVICE_IP/fiap"
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/ --data 'name=loja' --data 'url=http://front-end.sock-shop.svc.cluster.local'"
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/'"
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/loja/routes --data 'paths[]=/loja'"
-#p ""
-#pe "curl -i -X GET --url http://$SERVICE_IP/loja"
-#p ""
-#p " ### ativando Autenticacao no API GATEWAY para rota /mockbin"
-#curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/plugins/ --data 'name=key-auth'
-#curl -i -X POST --url http://$SERVICE_IP:8001/consumers/ --data "username=TDC"
-#curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'key=senha'
-##
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/services/exemplo/plugins/ --data 'name=key-auth'"
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP/mockbin/delay/2000"
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/consumers/ --data \"username=TDC\""
-#p ""
-#pe "curl -i -X POST --url http://$SERVICE_IP:8001/consumers/TDC/key-auth/ --data 'key=senha'"
-#p ""
-#pe "curl -i -X GET --url http://$SERVICE_IP/mockbin/delay/2000 --header \"apikey: senha\""
-#p ""
+#Shop: http://shop.${INGRESS_DOMAIN}
 
 ########### Excluir o cluster do GKE
 
