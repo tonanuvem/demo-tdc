@@ -27,6 +27,7 @@ DEMO_PROMPT="\r${WHITE}$ "
 clear
 
 #	Definir as variáveis de ambiente:
+gcloud config set project temporal-bebop-225715
 REGION=us-central1
 ZONE=${REGION}-b
 PROJECT=$(gcloud config get-value project)
