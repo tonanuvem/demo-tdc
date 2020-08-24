@@ -69,7 +69,7 @@ pe "kubectl get pod -n istio-system"
 #pe "kubectl get pods -n istio-system | grep istiod"
 
 p " ### habilitar modulo KIALI do ISTIO service mesh"
-kubectl apply -f ../istio-1.7.0/samples/addons
+kubectl apply -f ../istio-1.7.0/samples/addons | grep created
 while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -n istio-system; do sleep 1; done
 
 # Istio Ingress gateway (istio-ingressgateway
