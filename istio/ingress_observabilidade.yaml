@@ -12,7 +12,7 @@ spec:
       name: http-grafana
       protocol: HTTP
     hosts:
-    - "grafana.${INGRESS_DOMAIN}"
+    - "grafana.DOMINIO"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -21,7 +21,7 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - "grafana.${INGRESS_DOMAIN}"
+  - "grafana.DOMINIO"
   gateways:
   - grafana-gateway
   http:
@@ -57,7 +57,7 @@ spec:
       name: http-kiali
       protocol: HTTP
     hosts:
-    - "kiali.${INGRESS_DOMAIN}"
+    - "kiali.DOMINIO"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -66,7 +66,7 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - "kiali.${INGRESS_DOMAIN}"
+  - "kiali.DOMINIO"
   gateways:
   - kiali-gateway
   http:
@@ -102,7 +102,7 @@ spec:
       name: http-prom
       protocol: HTTP
     hosts:
-    - "prometheus.${INGRESS_DOMAIN}"
+    - "prometheus.DOMINIO"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -111,7 +111,7 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - "prometheus.${INGRESS_DOMAIN}"
+  - "prometheus.DOMINIO"
   gateways:
   - prometheus-gateway
   http:
@@ -147,7 +147,7 @@ spec:
       name: http-prom
       protocol: HTTP
     hosts:
-    - "prometheus.${INGRESS_DOMAIN}"
+    - "prometheus.DOMINIO"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -156,7 +156,7 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - "prometheus.${INGRESS_DOMAIN}"
+  - "prometheus.DOMINIO"
   gateways:
   - prometheus-gateway
   http:
@@ -192,7 +192,7 @@ spec:
       name: http-tracing
       protocol: HTTP
     hosts:
-    - "tracing.${INGRESS_DOMAIN}"
+    - "tracing.DOMINIO"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -201,7 +201,7 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - "tracing.${INGRESS_DOMAIN}"
+  - "tracing.DOMINIO"
   gateways:
   - tracing-gateway
   http:
