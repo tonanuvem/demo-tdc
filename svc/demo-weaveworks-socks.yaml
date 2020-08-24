@@ -1,10 +1,10 @@
 # https://github.com/microservices-demo/microservices-demo/blob/master/deploy/kubernetes/complete-demo.yaml
 # mudanças: adicionado namespace 'sock-shop' e alterado o tipo do service 'LoadBalancer'
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: sock-shop
----
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: sock-shop
+#---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
