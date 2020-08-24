@@ -91,6 +91,7 @@ sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
 
 #p " ### vamos habilitar a observabilidade do nosso service mesh"
 kubectl apply -f istio/ingress_observabilidade.yaml
+kubectl get pod -n istio-system
 
 # Executar a aplicação Sock Shop : A Microservice Demo Application
 p " ### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
@@ -99,10 +100,9 @@ kubectl label namespace sock-shop istio-injection=enabled
 pe "kubectl create -f svc/demo-weaveworks-socks.yaml"
 sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_shop.yaml
 kubectl apply -f istio/ingress_shop.yaml
-../istio-1.7.0/bin/istioctl analyze --all-namespaces
+#../istio-1.7.0/bin/istioctl analyze --all-namespaces
 #pe "kubectl get svc -n sock-shop"
-#kubectl get all -n sock-shop
-kubectl get pod -n istio-system
+kubectl get all -n sock-shop
 
 p " ### vamos verificar o IP Externo (API Gateway/Ingress):"
 kubectl get svc istio-ingressgateway -n istio-system
