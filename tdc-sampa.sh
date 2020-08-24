@@ -64,7 +64,7 @@ kubectl label namespace kube-node-lease istio-injection=enabled
 ../istio-1.7.0/bin/istioctl analyze
 #pe "kubectl get deploy -n istio-system"
 #pe "kubectl get rs -n istio-system"
-pe "kubectl get pod -n istio-system"
+#pe "kubectl get pod -n istio-system"
 #pe "kubectl get service -n istio-system"
 #p "### aumentar resiliencia do ISTIO service mesh"
 #pe "kubectl scale -n istio-system --replicas=2 deployment/istiod"
@@ -95,9 +95,10 @@ kubectl apply -f istio/ingress_shop.yaml
 ../istio-1.7.0/bin/istioctl analyze --all-namespaces
 #pe "kubectl get svc -n sock-shop"
 #kubectl get all -n sock-shop
+kubectl get pod -n istio-system
 
-p " ### vamos verificar o Ingress IP Externo:"
-pe "kubectl get svc istio-ingressgateway -n istio-system"
+p " ### vamos verificar o IP Externo (API Gateway/Ingress):"
+kubectl get svc istio-ingressgateway -n istio-system
 #pe "kubectl get svc"
 #p ""
 #pe "kubectl get svc -n sock-shop | grep front-end"
@@ -107,7 +108,7 @@ pe "kubectl get svc istio-ingressgateway -n istio-system"
 #pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
 p " # Visualizar o Service Mesh: http://kiali.${INGRESS_DOMAIN}"
 p ""
-p " # Acessar no navegador: http://shop.${INGRESS_DOMAIN}"
+p " # Acessar Shop no navegador: http://shop.${INGRESS_DOMAIN}"
 p ""
 
 #Kiali: http://kiali.${INGRESS_DOMAIN}
