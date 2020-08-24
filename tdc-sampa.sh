@@ -88,7 +88,6 @@ p " ### vamos Executar a aplicação Sock Shop (Microservice Demo Application):"
 kubectl create ns sock-shop
 kubectl label namespace sock-shop istio-injection=enabled
 pe "kubectl create -f svc/demo-weaveworks-socks.yaml"
-kubectl label namespace sock-shop istio-injection=enabled
 sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_shop.yaml
 kubectl apply -f istio/ingress_shop.yaml
 ../istio-1.7.0/bin/istioctl analyze --all-namespaces
