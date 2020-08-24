@@ -37,38 +37,37 @@ CLUSTER_VERSION=1.17.8-gke.17
 #pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --cluster-version=latest"
 
 # Criar um cluster de cinco nós:
-gcloud beta container clusters create ${CLUSTER} \
-    --cluster-version=latest" \
-#    --cluster-version=${CLUSTER_VERSION} \
-#    --addons=Istio --istio-config=auth=MTLS_STRICT \
-    --machine-type=n1-standard-2 \
-    --num-nodes=5 --zone ${ZONE}
+gcloud container clusters create ${CLUSTER} --cluster-version=latest --machine-type=n1-standard-2 --num-nodes=5 --zone ${ZONE}
+#gcloud beta container clusters create ${CLUSTER} \
+#    --cluster-version=latest \
+##    --cluster-version=${CLUSTER_VERSION} \
+##    --addons=Istio --istio-config=auth=MTLS_STRICT \
+#    --machine-type=n1-standard-2 \
+#    --num-nodes=5 --zone ${ZONE}
 
 # Verificar as 2 instâncias e os pods do namespace kube-system:
 #p ""
 gcloud container clusters get-credentials $CLUSTER --zone $ZONE
 #pe "kubectl get pods -n kube-system"
-pe "gcloud container clusters list"
+#pe "gcloud container clusters list"
 pe "gcloud compute instances list"
 
 
-# Istio sem addon
+# Istio service mesh
 #curl -L https://istio.io/downloadIstio | sh - 
 #cd istio-1.7.0 && export PATH=$PWD/bin:$PATH
-istioctl install --set profile=demo
+p "### vamos instalar ISTIO service mesh"
+../istio-1.7.0/bin/istioctl install --set profile=demo
 kubectl label namespace default istio-injection=enabled
-kubectl get pod -n istio-system
-istioctl analyze
-
-# Verificar Istio service mesh:
-#p "### vamos Verificar ISTIO service mesh"
+../istio-1.7.0/bin/istioctl analyze
+pe "kubectl get pod -n istio-system"
 pe "kubectl get service -n istio-system"
-pe "kubectl label namespace default istio-injection=enabled"
-pe "kubectl get pods -n istio-system"
-pe "kubectl scale -n istio-system --replicas=2 deployment/istio-pilot"
-pe "kubectl get pods -n istio-system | grep istio-pilot"
-
-
+p "### aumentar resiliencia do ISTIO service mesh"
+pe "kubectl scale -n istio-system --replicas=2 deployment/istiod"
+pe "kubectl get pods -n istio-system | grep istiod"
+p "### habilitar modulo KIALI do ISTIO service mesh"
+kubectl apply -f ../istio-1.7.0/samples/addons
+while ! kubectl wait --for=condition=available --timeout=600s deployment/kiali -n istio-system; do sleep 1; done
 
 # Rodar microservicos no Kubernetes
 #p "### vamos Executar a aplicação FIAP (slackpage):"
@@ -89,6 +88,14 @@ p ""
 
 # Istio Ingress gateway (istio-ingressgateway
 # https://istio.io/docs/tasks/traffic-management/
+# https://istio.io/latest/docs/tasks/observability/gateways/
+kubectl get svc istio-ingressgateway -n istio-system
+export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+export INGRESS_DOMAIN=${INGRESS_HOST}.nip.io
+echo $INGRESS_DOMAIN
+sed -i 's|DOMINIO|'$INGRESS_DOMAIN'|' istio/ingress_observabilidade.yaml
+kubectl apply -f istio/ingress_observabilidade.yaml
+
 
 # Kiali
 pe "kubectl patch svc kiali -n istio-system -p '{'spec': {'type': 'LoadBalancer'}}' && kubectl get svc kiali -n istio-system"
