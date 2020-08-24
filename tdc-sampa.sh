@@ -32,7 +32,7 @@ REGION=us-central1
 ZONE=${REGION}-b
 PROJECT=$(gcloud config get-value project)
 CLUSTER=gke-tdc-sampa
-CLUSTER_VERSION=1.17.8-gke.17
+#CLUSTER_VERSION=1.17.8-gke.17
 
 # Criar um cluster de dois nós:
 #pe "gcloud container clusters create ${CLUSTER} --num-nodes=3 --zone ${ZONE} --cluster-version=latest"
