@@ -1,0 +1,49 @@
+# Definição do problema consta no link abaixo:
+# https://itnext.io/save-on-your-aws-bill-with-kubernetes-ingress-148214a79dcb
+# https://kubernetes.github.io/ingress-nginx/deploy/#gce-gke
+# kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $(gcloud config get-value account)
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud/deploy.yaml
+# kubectl get pods -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx
+# ---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tdc-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+  - http:
+      paths:
+# Erro: while evaluating the ingress spec: service "default/svc-externo" is type "ExternalName", expected "NodePort" or "LoadBalancer";
+#      - path: /mockbin
+#        backend:
+#          serviceName: svc-externo
+#          servicePort: 80
+      - path: /fiap
+        backend:
+          serviceName: fiap-service
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tdc-ingress-loja
+  namespace: sock-shop
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /(.+)
+        backend:
+          serviceName: front-end
+          servicePort: 80
+#      - path: /loja
+#        backend:
+#          serviceName: front-end
+#          servicePort: 80
+

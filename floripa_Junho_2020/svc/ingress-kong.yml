@@ -1,0 +1,9 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: kong-tdc-ingress
+  namespace: kong
+spec:
+  backend:
+    serviceName: kong
+    servicePort: 80
